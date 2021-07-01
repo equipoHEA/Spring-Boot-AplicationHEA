@@ -6,9 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.example.AppUsers.Exception.UsernameOrIdNotFound;
 import com.example.AppUsers.dto.ChangePasswordForm;
 import com.example.AppUsers.entity.User;
 import com.example.AppUsers.repository.UserRepository;
@@ -59,8 +61,8 @@ public class UserServiceImpl implements UserService {
 	}
 	
 	@Override
-	public User getUserById(Long id) throws Exception {
-		return repository.findById(id).orElseThrow(() -> new Exception("El usuario no existe"));
+	public User getUserById(Long id) throws UsernameOrIdNotFound {
+		return repository.findById(id).orElseThrow(() -> new UsernameOrIdNotFound("El Id de usuario no existe"));
 	}
 	
 	@Override
@@ -81,7 +83,7 @@ public class UserServiceImpl implements UserService {
 	
 	@Override
 	@PreAuthorize("hasAnyRole('ROLE_ADMIN')")
-	public void deleteUser(Long id) throws Exception {
+	public void deleteUser(Long id) throws UsernameOrIdNotFound {
 		User user = getUserById(id);
 		
 		repository.delete(user);

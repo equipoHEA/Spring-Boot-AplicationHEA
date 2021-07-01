@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import com.example.AppUsers.entity.User;
 import com.example.AppUsers.repository.RoleRepository;
+import com.example.AppUsers.Exception.UsernameOrIdNotFound;
 import com.example.AppUsers.Service.UserService;
 import com.example.AppUsers.dto.ChangePasswordForm;
 
@@ -122,8 +123,8 @@ public class UserController {
 	public String deleteUser(Model model, @PathVariable(name="id") Long id) {
 		try {
 			userService.deleteUser(id);
-		} catch (Exception e) {
-			model.addAttribute("listErrorMessage",e.getMessage());
+		} catch (UsernameOrIdNotFound uoin) {
+			model.addAttribute("listErrorMessage",uoin.getMessage());
 		}
 		return userForm(model);
 	}
