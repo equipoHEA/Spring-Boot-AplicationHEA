@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import com.example.AppUsers.entity.User;
 import com.example.AppUsers.repository.RoleRepository;
+import com.example.AppUsers.Exception.CustomeFieldValidationException;
 import com.example.AppUsers.Exception.UsernameOrIdNotFound;
 import com.example.AppUsers.Service.UserService;
 import com.example.AppUsers.dto.ChangePasswordForm;
@@ -58,7 +59,14 @@ public class UserController {
 				userService.createUser(user);
 				model.addAttribute("userForm",new User());
 				model.addAttribute("listTab","active");
-			} catch (Exception e) {
+			}catch (CustomeFieldValidationException cfve) {
+				result.rejectValue(cfve.getFieldName(), null, cfve.getMessage());			
+				model.addAttribute("userForm", user);
+				model.addAttribute("formTab","active");
+				model.addAttribute("userList", userService.getAllUsers());
+				model.addAttribute("roles",roleRepository.findAll());
+			} 
+			catch (Exception e) {
 				model.addAttribute("formErrorMessage", e.getMessage());
 				model.addAttribute("userForm", user);
 				model.addAttribute("formTab","active");
