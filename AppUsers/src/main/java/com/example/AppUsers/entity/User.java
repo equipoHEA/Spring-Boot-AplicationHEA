@@ -12,13 +12,11 @@ import javax.persistence.Id;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Transient;
+import javax.validation.constraints.Email;
 //import javax.validation.constraints.Size;
+import javax.validation.constraints.NotBlank;
 
 import org.hibernate.annotations.GenericGenerator;
-//import org.hibernate.validator.constraints.Email;
-//import org.hibernate.validator.constraints.NotBlank;
-
-import com.sun.istack.NotNull;
 
 import javax.persistence.JoinColumn;
 
@@ -37,23 +35,24 @@ public class User implements Serializable{
 	private Long id;
 	
 	@Column 
-	@NotNull
+	@NotBlank
 	private String firstName;
 	
 	@Column 
-	@NotNull
+	@NotBlank
 	private String lastName;
 	
 	@Column(unique = true)
-	@NotNull
+	@NotBlank
+	@Email
 	private String email;
 	
 	@Column(unique = true)
-	@NotNull
+	@NotBlank
 	private String username;
 	
 	@Column
-	@NotNull
+	@NotBlank
 	private String password;
 	
 	@Transient 

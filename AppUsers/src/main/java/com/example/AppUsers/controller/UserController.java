@@ -1,8 +1,10 @@
 package com.example.AppUsers.controller;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
-//import javax.validation.Valid;
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +20,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import com.example.AppUsers.entity.Role;
 import com.example.AppUsers.entity.User;
 import com.example.AppUsers.repository.RoleRepository;
+
 import com.example.AppUsers.Exception.CustomeFieldValidationException;
 import com.example.AppUsers.Exception.UsernameOrIdNotFound;
 import com.example.AppUsers.Service.UserService;
@@ -39,6 +43,41 @@ public class UserController {
 			return "index";
 		}
 	
+	@GetMapping("/signup")
+	public String signup(Model model) {
+		Role userRole = roleRepository.findByName("USER");
+		List<Role> roles = Arrays.asList(userRole);
+		model.addAttribute("userForm", new User());
+		model.addAttribute("roles",roles);
+		model.addAttribute("signup",true);
+		return "user-form/user-signup";
+	}
+
+	@PostMapping("/signup")
+	public String postSignup(@Valid @ModelAttribute("userForm")User user, BindingResult result, ModelMap model){
+		Role userRole = roleRepository.findByName("USER");
+		List<Role> roles = Arrays.asList(userRole);
+		model.addAttribute("userForm", user);
+		model.addAttribute("roles",roles);
+		model.addAttribute("signup",true);
+		if(result.hasErrors()) {
+			return "user-form/user-signup";
+		}else {
+			try {
+				userService.createUser(user);
+			}catch (CustomeFieldValidationException cfve) {
+				result.rejectValue(cfve.getFieldName(), null, cfve.getMessage());
+				return "user-form/user-signup";
+			} 
+			catch (Exception e) {
+				model.addAttribute("formErrorMessage", e.getMessage());
+				return "user-form/user-signup";
+			}
+		}
+		
+		return "index";
+	}
+	
 	@GetMapping("/userForm")
 	public String userForm(Model model) {
 		model.addAttribute("userForm", new User());
@@ -50,7 +89,7 @@ public class UserController {
 	
 	
 	@PostMapping("/userForm")
-	public String createUser(@Validated @ModelAttribute("userForm")User user, BindingResult result, ModelMap model){
+	public String createUser(@Valid @ModelAttribute("userForm")User user, BindingResult result, ModelMap model){
 		if(result.hasErrors()) {
 			model.addAttribute("userForm", user);
 			model.addAttribute("formTab","active");
@@ -95,7 +134,7 @@ public class UserController {
 	};
 	
 	@PostMapping("/editUser")
-	public String postEditUserForm(@Validated @ModelAttribute("userForm")User user, BindingResult result, ModelMap model){
+	public String postEditUserForm(@Valid @ModelAttribute("userForm")User user, BindingResult result, ModelMap model){
 		if(result.hasErrors()) {
 			model.addAttribute("userForm", user);
 			model.addAttribute("formTab","active");
